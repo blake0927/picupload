@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上傳照片</title>
+</head>
+<body>
+  <h1>上傳照片給指定收件人</h1>
+  <form id="uploadForm">
+    <input type="file" name="photoFile" accept="image/*" required>
+    <br><br>
+    <button type="submit">上傳</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // 阻止表單預設提交行為
+      
+      const form = event.target;
+      const fileInput = form.querySelector('input[name="photoFile"]');
+      const statusElement = document.getElementById('status');
+
+      if (fileInput.files.length === 0) {
+        statusElement.textContent = '請選擇一個檔案。';
+        return;
+      }
+      
+      // 顯示上傳中訊息
+      statusElement.textContent = '上傳中，請稍候...';
+
+      const formData = new FormData(form);
+      
+      // 將這裡替換成你的 Google Apps Script 部署後的網址
+      const scriptUrl = 'https://script.google.com/macros/s/AKfycbx2lxJiDDTNYGjszENBzDPe4sEGWLP5EqaFtjuIrLLxz05zLeIMXyW4N7I4TpUgONVj/exec'; 
+
+      fetch(scriptUrl, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(html => {
+        // 將回傳的 HTML 訊息顯示在頁面上
+        statusElement.innerHTML = html;
+      })
+      .catch(error => {
+        statusElement.textContent = '上傳失敗：' + error;
+      });
+    });
+  </script>
+</body>
+</html>
